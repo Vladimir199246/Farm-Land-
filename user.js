@@ -7,8 +7,8 @@
 // @match        https://farmy.live/*
 // @grant        none
 // @icon         blob:https://web.telegram.org/ab036d15-461c-47b2-87d1-ccf77a815e25
-// @downloadURL  https://raw.githubusercontent.com/Vladimir199246/Farm-Land/main/user.js
-// @updateURL    https://raw.githubusercontent.com/Vladimir199246/Farm-Land/main/user.js
+// @downloadURL  https://github.com/Vladimir199246/Farm/raw/refs/heads/main/user.js
+// @updateURL    https://github.com/Vladimir199246/Farm/raw/refs/heads/main/user.js
 // @run-at       document-idle
 // ==/UserScript==
 (function() {
