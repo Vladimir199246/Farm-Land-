@@ -3,7 +3,7 @@
 // @namespace    http://tampermonkey.net/
 // @version      2.8
 // @description  Автоматично відкриває завдання з обмеженням 100 реклам
-// @author       Vladimir199246
+// @author       Volodymyr_Romanovych
 // @match        https://farmy.live/*
 // @grant        none
 // @icon         https://raw.githubusercontent.com/Vladimir199246/Farm/refs/heads/main/icon.jpg
