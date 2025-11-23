@@ -6,10 +6,10 @@
 // @author       Volodymyr_Romanovych
 // @match        https://farmy.live/*
 // @grant        none
-// @icon         https://raw.githubusercontent.com/Vladimir199246/Farm/refs/heads/main/icon.jpg
-// @downloadURL  https://github.com/Vladimir199246/Farm/raw/refs/heads/main/user.js
-// @updateURL    https://github.com/Vladimir199246/Farm/raw/refs/heads/main/user.js
-// @homepage     https://github.com/Vladimir199246/Farm
+// @icon         https://raw.githubusercontent.com/Volodymyr-Romanovych/Farm/refs/heads/main/icon.jpg
+// @downloadURL  https://github.com/Volodymyr-Romanovych/Farm/raw/refs/heads/main/user.js
+// @updateURL    https://github.com/Volodymyr-Romanovych/Farm/raw/refs/heads/main/user.js
+// @homepage     https://github.com/Volodymyr-Romanovych/Farm
 // @run-at       document-idle
 // ==/UserScript==
 (function() {
