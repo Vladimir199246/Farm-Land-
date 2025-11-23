@@ -6,7 +6,7 @@
 // @author       Volodymyr_Romanovych
 // @match        https://farmy.live/*
 // @grant        none
-// @icon         blob:https://web.telegram.org/ab036d15-461c-47b2-87d1-ccf77a815e25
+// @icon         https://github.com/Vladimir199246/Farm/blob/main/icon.jpg?raw=true
 // @downloadURL  https://github.com/Vladimir199246/Farm/raw/refs/heads/main/user.js
 // @updateURL    https://github.com/Vladimir199246/Farm/raw/refs/heads/main/user.js
 // @run-at       document-idle
