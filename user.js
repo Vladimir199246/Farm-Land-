@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Farm Land Auto Quest & Ads Claim (100 Max)
 // @namespace    http://tampermonkey.net/
-// @version      2.2
+// @version      2.3
 // @description  Автоматично відкриває завдання з обмеженням 100 реклам
 // @author       Volodymyr_Romanovych
 // @match        https://farmy.live/*
