@@ -454,7 +454,7 @@
                     const nextDelay = getRandomDelay();
                     console.log(`Переглядаємо рекламу (${totalAdWatches}/${MAX_TOTAL_ADS})`);
 
-                    await wait(32000); // 32 секунди
+                    await wait(37000); // 37 секунди
 
                     isWatchingAd = false;
                     currentDelay = nextDelay;
