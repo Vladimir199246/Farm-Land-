@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Farm Land Auto Quest & Ads Claim (100 Max) - Enhanced
 // @namespace    http://tampermonkey.net/
-// @version      1.2
+// @version      1.3
 // @description  Покращена версія з виправленнями помилок та додатковими функціями
 // @author       Volodymyr_Romanovych
 // @match        https://farmy.live/*
