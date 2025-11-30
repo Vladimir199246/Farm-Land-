@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         Farm Land Auto Quest & Ads Claim - Ultimate Edition v1.51
+// @name         Farm Land Auto Quest
 // @namespace    http://tampermonkey.net/
-// @version      1.35
+// @version      1.51
 // @description  Покращена версія з виправленим інтерфейсом та оптимізацією
 // @author       Volodymyr_Romanovych
 // @match        https://farmy.live/*
@@ -222,7 +222,7 @@
         container.id = 'auto-control-panel';
         container.innerHTML = `
             <div class="panel-header" id="panel-header">
-                <span>🚜 Farm Land Auto v1.51</span>
+                <span>🚜 Farm Land Auto v1.35</span>
                 <div class="header-buttons">
                     <button class="minimize-btn" id="minimize-btn">−</button>
                 </div>
