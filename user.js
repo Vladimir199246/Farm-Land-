@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Farm Land Auto Quest
 // @namespace    http://tampermonkey.net/
-// @version      1.51
+// @version      1.36
 // @description  Покращена версія з виправленим інтерфейсом та оптимізацією
 // @author       Volodymyr_Romanovych
 // @match        https://farmy.live/*
@@ -69,7 +69,7 @@
 
     // Ініціалізація
     function init() {
-        console.log('🚀 Farm Land Auto Quest & Ads Claim - Ultimate Edition v1.51 завантажується...');
+        console.log('🚀 Farm Land Auto Quest & Ads Claim - Ultimate Edition v1.52 завантажується...');
 
         loadSettings();
         loadProgress();
@@ -222,7 +222,7 @@
         container.id = 'auto-control-panel';
         container.innerHTML = `
             <div class="panel-header" id="panel-header">
-                <span>🚜 Farm Land Auto v1.35</span>
+                <span> Farm Land Auto v1.36</span>
                 <div class="header-buttons">
                     <button class="minimize-btn" id="minimize-btn">−</button>
                 </div>
@@ -252,9 +252,15 @@
                         <label>Макс. реклам:</label>
                         <input type="number" id="max-ads-input" value="100" min="1" max="500" class="setting-input">
                     </div>
-                    <div class="setting-item">
-                        <label>Затримка (сек):</label>
-                        <input type="number" id="min-delay-input" value="13" min="5" max="60" class="setting-input">
+                    <div class="delay-settings">
+                        <div class="setting-item">
+                            <label>Затримка від (сек):</label>
+                            <input type="number" id="min-delay-input" value="13" min="5" max="60" class="setting-input">
+                        </div>
+                        <div class="setting-item">
+                            <label>Затримка до (сек):</label>
+                            <input type="number" id="max-delay-input" value="20" min="10" max="120" class="setting-input">
+                        </div>
                     </div>
                 </div>
 
@@ -452,6 +458,12 @@
                 border: 1px solid rgba(255,255,255,0.1);
             }
 
+            .delay-settings {
+                margin-top: 8px;
+                padding-top: 8px;
+                border-top: 1px solid rgba(255,255,255,0.1);
+            }
+
             .setting-item {
                 display: flex;
                 justify-content: space-between;
@@ -512,6 +524,7 @@
         const resetBtn = document.getElementById('reset-btn');
         const maxAdsInput = document.getElementById('max-ads-input');
         const minDelayInput = document.getElementById('min-delay-input');
+        const maxDelayInput = document.getElementById('max-delay-input');
 
         // Перетягування
         header.addEventListener('mousedown', startDrag);
@@ -526,6 +539,24 @@
         // Налаштування в реальному часі
         maxAdsInput.addEventListener('change', updateMaxAds);
         minDelayInput.addEventListener('change', updateMinDelay);
+        maxDelayInput.addEventListener('change', updateMaxDelay);
+
+        // Валідація затримок
+        minDelayInput.addEventListener('blur', validateDelays);
+        maxDelayInput.addEventListener('blur', validateDelays);
+    }
+
+    function validateDelays() {
+        const minDelay = parseInt(document.getElementById('min-delay-input').value) || 13;
+        const maxDelay = parseInt(document.getElementById('max-delay-input').value) || 20;
+
+        if (minDelay > maxDelay) {
+            showNotification('Помилка: "Затримка від" не може бути більше ніж "Затримка до"!', 'error');
+            document.getElementById('min-delay-input').value = Math.min(minDelay, maxDelay);
+            document.getElementById('max-delay-input').value = Math.max(minDelay, maxDelay);
+            updateMinDelay();
+            updateMaxDelay();
+        }
     }
 
     function updateMaxAds() {
@@ -537,8 +568,38 @@
 
     function updateMinDelay() {
         const input = document.getElementById('min-delay-input');
-        settings.minDelay = (parseInt(input.value) || 13) * 1000;
+        const minValue = parseInt(input.value) || 13;
+        settings.minDelay = minValue * 1000;
+        
+        // Оновлюємо максимальну затримку якщо потрібно
+        const maxDelayInput = document.getElementById('max-delay-input');
+        const maxValue = parseInt(maxDelayInput.value) || 20;
+        
+        if (minValue > maxValue) {
+            maxDelayInput.value = minValue + 1;
+            settings.maxDelay = (minValue + 1) * 1000;
+        }
+        
         saveSettings();
+        showNotification(`Затримка оновлена: ${minValue}-${maxValue} сек`, 'success');
+    }
+
+    function updateMaxDelay() {
+        const input = document.getElementById('max-delay-input');
+        const maxValue = parseInt(input.value) || 20;
+        settings.maxDelay = maxValue * 1000;
+        
+        // Оновлюємо мінімальну затримку якщо потрібно
+        const minDelayInput = document.getElementById('min-delay-input');
+        const minValue = parseInt(minDelayInput.value) || 13;
+        
+        if (maxValue < minValue) {
+            minDelayInput.value = Math.max(5, maxValue - 1);
+            settings.minDelay = (Math.max(5, maxValue - 1)) * 1000;
+        }
+        
+        saveSettings();
+        showNotification(`Затримка оновлена: ${minValue}-${maxValue} сек`, 'success');
     }
 
     function toggleMinimize() {
@@ -561,9 +622,11 @@
     function updateSettingsForm() {
         const maxAdsInput = document.getElementById('max-ads-input');
         const minDelayInput = document.getElementById('min-delay-input');
+        const maxDelayInput = document.getElementById('max-delay-input');
 
         if (maxAdsInput) maxAdsInput.value = settings.maxAds;
         if (minDelayInput) minDelayInput.value = Math.round(settings.minDelay / 1000);
+        if (maxDelayInput) maxDelayInput.value = Math.round(settings.maxDelay / 1000);
     }
 
     // === ФУНКЦІОНАЛ ПЕРЕТЯГУВАННЯ ===
@@ -723,12 +786,14 @@
 
     // === ОСНОВНА ЛОГІКА ===
     function getAdaptiveDelay() {
+        // Генеруємо випадкову затримку в межах minDelay - maxDelay
         const baseDelay = Math.floor(Math.random() * (settings.maxDelay - settings.minDelay + 1)) + settings.minDelay;
 
         if (!settings.adaptiveDelays) {
             return baseDelay;
         }
 
+        // Адаптивні коригування
         if (state.errorCount > 0) {
             return baseDelay + (state.errorCount * 2000);
         }
@@ -1257,7 +1322,7 @@
         const progress = {
             totalAdWatches: state.totalAdWatches,
             lastRun: Date.now(),
-            version: '1.51'
+            version: '1.52'
         };
         localStorage.setItem('farmLandAutoProgress', JSON.stringify(progress));
     }
@@ -1347,7 +1412,7 @@
     window.resetAutoCounters = resetCounters;
 
     // Запуск скрипта
-    console.log('🚀 Farm Land Auto Quest & Ads Claim - Ultimate Edition v1.51 активовано!');
+    console.log('🚀 Farm Land Auto Quest & Ads Claim - Ultimate Edition v1.52 активовано!');
     console.log('🛡️ Захищений режим | 🎲 Адаптивні затримки | 💾 Автозбереження');
 
     init();
