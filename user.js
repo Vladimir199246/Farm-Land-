@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Farm Land Auto Quest
 // @namespace    http://tampermonkey.net/
-// @version      1.36
+// @version      1.37
 // @description  Покращена версія з виправленим інтерфейсом та оптимізацією
 // @author       Volodymyr_Romanovych
 // @match        https://farmy.live/*
@@ -69,7 +69,7 @@
 
     // Ініціалізація
     function init() {
-        console.log('🚀 Farm Land Auto Quest & Ads Claim - Ultimate Edition v1.52 завантажується...');
+        console.log('🚀 Farm Land Auto Quest & Ads Claim - Ultimate Edition v1.37 завантажується...');
 
         loadSettings();
         loadProgress();
@@ -222,7 +222,7 @@
         container.id = 'auto-control-panel';
         container.innerHTML = `
             <div class="panel-header" id="panel-header">
-                <span> Farm Land Auto v1.36</span>
+                <span> Farm Land Auto v1.37</span>
                 <div class="header-buttons">
                     <button class="minimize-btn" id="minimize-btn">−</button>
                 </div>
@@ -293,23 +293,31 @@
                 border: 2px solid #4CAF50;
                 border-radius: 15px;
                 padding: 0;
-                min-width: 280px;
+                width: 280px;
                 box-shadow: 0 10px 40px rgba(0,0,0,0.6);
                 user-select: none;
                 font-family: 'Segoe UI', system-ui, sans-serif;
                 transition: all 0.3s ease;
-                max-height: 80vh;
-                overflow: hidden;
                 color: white;
             }
 
             #auto-control-panel.minimized {
-                height: 45px;
-                min-width: 200px;
+                width: 200px !important;
+                height: 45px !important;
+                overflow: hidden;
             }
 
             #auto-control-panel.minimized .panel-content {
-                display: none;
+                display: none !important;
+            }
+
+            #auto-control-panel:not(.minimized) {
+                width: 280px !important;
+                height: auto !important;
+            }
+
+            #auto-control-panel:not(.minimized) .panel-content {
+                display: block !important;
             }
 
             .panel-header {
@@ -335,20 +343,22 @@
                 background: rgba(255,255,255,0.2);
                 border: none;
                 color: white;
-                width: 24px;
-                height: 24px;
+                width: 30px;
+                height: 30px;
                 border-radius: 6px;
                 cursor: pointer;
-                font-size: 16px;
+                font-size: 18px;
                 line-height: 1;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 transition: all 0.2s ease;
                 font-weight: bold;
+                touch-action: manipulation;
+                -webkit-tap-highlight-color: transparent;
             }
 
-            .minimize-btn:hover {
+            .minimize-btn:hover, .minimize-btn:active {
                 background: rgba(255,255,255,0.3);
                 transform: scale(1.1);
             }
@@ -418,7 +428,7 @@
             }
 
             .btn {
-                padding: 10px 8px;
+                padding: 12px 8px;
                 border: none;
                 border-radius: 8px;
                 color: white;
@@ -427,6 +437,9 @@
                 cursor: pointer;
                 transition: all 0.3s ease;
                 text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+                touch-action: manipulation;
+                -webkit-tap-highlight-color: transparent;
+                min-height: 40px;
             }
 
             .btn.start {
@@ -441,7 +454,7 @@
                 background: linear-gradient(135deg, #FF9800, #e68900);
             }
 
-            .btn:hover {
+            .btn:hover, .btn:active {
                 transform: translateY(-2px);
                 box-shadow: 0 4px 12px rgba(0,0,0,0.3);
             }
@@ -489,6 +502,7 @@
                 color: white;
                 font-size: 12px;
                 text-align: center;
+                touch-action: manipulation;
             }
 
             .setting-input:focus {
@@ -507,6 +521,25 @@
             @keyframes slideDown {
                 from { opacity: 0; transform: translateY(-10px); }
                 to { opacity: 1; transform: translateY(0); }
+            }
+
+            /* Для сенсорних пристроїв */
+            @media (hover: none) and (pointer: coarse) {
+                .btn, .minimize-btn {
+                    min-height: 44px;
+                    min-width: 44px;
+                }
+                
+                .minimize-btn {
+                    width: 36px;
+                    height: 36px;
+                    font-size: 20px;
+                }
+                
+                .setting-input {
+                    min-height: 36px;
+                    font-size: 14px;
+                }
             }
         `;
 
@@ -528,13 +561,32 @@
 
         // Перетягування
         header.addEventListener('mousedown', startDrag);
-        header.addEventListener('touchstart', startDrag);
+        header.addEventListener('touchstart', startDrag, { passive: false });
 
         // Кнопки управління
         minimizeBtn.addEventListener('click', toggleMinimize);
+        minimizeBtn.addEventListener('touchend', function(e) {
+            e.preventDefault();
+            toggleMinimize();
+        }, { passive: false });
+        
         startBtn.addEventListener('click', manualClaim);
+        startBtn.addEventListener('touchend', function(e) {
+            e.preventDefault();
+            manualClaim();
+        }, { passive: false });
+        
         stopBtn.addEventListener('click', stopAutoClaim);
+        stopBtn.addEventListener('touchend', function(e) {
+            e.preventDefault();
+            stopAutoClaim();
+        }, { passive: false });
+        
         resetBtn.addEventListener('click', resetCounters);
+        resetBtn.addEventListener('touchend', function(e) {
+            e.preventDefault();
+            resetCounters();
+        }, { passive: false });
 
         // Налаштування в реальному часі
         maxAdsInput.addEventListener('change', updateMaxAds);
@@ -544,6 +596,30 @@
         // Валідація затримок
         minDelayInput.addEventListener('blur', validateDelays);
         maxDelayInput.addEventListener('blur', validateDelays);
+    }
+
+    function toggleMinimize() {
+        const panel = document.getElementById('auto-control-panel');
+        const minimizeBtn = document.getElementById('minimize-btn');
+
+        isPanelMinimized = !isPanelMinimized;
+
+        if (isPanelMinimized) {
+            // Згортаємо панель
+            panel.classList.add('minimized');
+            minimizeBtn.textContent = '+';
+            panel.style.width = '200px';
+            panel.style.height = '45px';
+        } else {
+            // Розгортаємо панель
+            panel.classList.remove('minimized');
+            minimizeBtn.textContent = '−';
+            panel.style.width = '280px';
+            panel.style.height = 'auto';
+        }
+
+        savePanelPosition();
+        showNotification(isPanelMinimized ? 'Панель згорнуто' : 'Панель розгорнуто', 'info');
     }
 
     function validateDelays() {
@@ -602,23 +678,6 @@
         showNotification(`Затримка оновлена: ${minValue}-${maxValue} сек`, 'success');
     }
 
-    function toggleMinimize() {
-        const panel = document.getElementById('auto-control-panel');
-        const minimizeBtn = document.getElementById('minimize-btn');
-
-        isPanelMinimized = !isPanelMinimized;
-
-        if (isPanelMinimized) {
-            panel.classList.add('minimized');
-            minimizeBtn.textContent = '+';
-        } else {
-            panel.classList.remove('minimized');
-            minimizeBtn.textContent = '−';
-        }
-
-        savePanelPosition();
-    }
-
     function updateSettingsForm() {
         const maxAdsInput = document.getElementById('max-ads-input');
         const minDelayInput = document.getElementById('min-delay-input');
@@ -646,13 +705,13 @@
             const touch = e.touches[0];
             dragOffsetX = touch.clientX - rect.left;
             dragOffsetY = touch.clientY - rect.top;
-            document.addEventListener('touchmove', onDrag);
+            document.addEventListener('touchmove', onDrag, { passive: false });
             document.addEventListener('touchend', stopDrag);
+            e.preventDefault();
         }
 
         container.style.transition = 'none';
         container.style.cursor = 'grabbing';
-        e.preventDefault();
     }
 
     function onDrag(e) {
@@ -670,6 +729,7 @@
             const touch = e.touches[0];
             clientX = touch.clientX;
             clientY = touch.clientY;
+            e.preventDefault();
         }
 
         const maxX = window.innerWidth - container.offsetWidth;
@@ -684,8 +744,6 @@
         container.style.left = newX + 'px';
         container.style.top = newY + 'px';
         container.style.right = 'auto';
-
-        e.preventDefault();
     }
 
     function stopDrag() {
@@ -728,7 +786,12 @@
                     container.style.right = 'auto';
 
                     if (position.minimized) {
-                        toggleMinimize();
+                        isPanelMinimized = true;
+                        container.classList.add('minimized');
+                        container.style.width = '200px';
+                        container.style.height = '45px';
+                        const minimizeBtn = document.getElementById('minimize-btn');
+                        if (minimizeBtn) minimizeBtn.textContent = '+';
                     }
                 }
             }
@@ -1412,7 +1475,7 @@
     window.resetAutoCounters = resetCounters;
 
     // Запуск скрипта
-    console.log('🚀 Farm Land Auto Quest & Ads Claim - Ultimate Edition v1.52 активовано!');
+    console.log('🚀 Farm Land Auto Quest & Ads Claim - Ultimate Edition v1.37 активовано!');
     console.log('🛡️ Захищений режим | 🎲 Адаптивні затримки | 💾 Автозбереження');
 
     init();
